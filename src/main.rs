@@ -3,7 +3,7 @@ use crate::parser::{Parser, ValueToString};
 use anyhow::Result;
 use clap::Parser as ClapParser;
 use cli::Cli;
-use crate::hasher::hash_bytes;
+use crate::hasher::{bytes_to_hex, hash_bytes};
 
 mod cli;
 mod parser;
@@ -35,7 +35,7 @@ fn main() -> Result<()> {
             println!("Piece Hashes:");
 
             for piece in result.info.pieces.chunks(20) {
-                println!("{}", hash_bytes(piece));
+                println!("{}", bytes_to_hex(piece));
             }
 
         }
