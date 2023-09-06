@@ -8,7 +8,6 @@ pub struct Cli {
     #[command(subcommand)]
     pub(crate) command: Commands,
 }
-
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Decodes <string> from the bencode format
