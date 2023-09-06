@@ -37,6 +37,12 @@ impl Parser {
     pub fn parse_torrent_file(&mut self, input: &[u8]) -> Result<TorrentFile> {
         serde_bencode::from_bytes(input).map_err(|e| anyhow!("Failed to parse input: {}", e))
     }
+
+    pub fn from_path(path: &str) -> Result<TorrentFile> {
+        let mut parser = Self::new();
+        let file_content = std::fs::read(path)?;
+        parser.parse_torrent_file(&file_content)
+    }
 }
 
 pub trait ValueToString {

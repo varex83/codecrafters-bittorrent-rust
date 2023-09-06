@@ -1,13 +1,14 @@
 use crate::cli::Commands;
+use crate::hasher::{bytes_to_hex, hash_bytes, hash_bytes_urlencode};
 use crate::parser::{Parser, ValueToString};
 use anyhow::Result;
 use clap::Parser as ClapParser;
 use cli::Cli;
-use crate::hasher::{bytes_to_hex, hash_bytes};
 
 mod cli;
-mod parser;
 mod hasher;
+mod parser;
+mod requests;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -21,23 +22,43 @@ fn main() -> Result<()> {
             println!("{}", result.to_string())
         }
         Commands::Info { path } => {
-            let mut parser = Parser::new();
+            let t_file = Parser::from_path(&path)?;
 
-            let file_content = std::fs::read(path)?;
+            println!("Tracker URL: {}", t_file.announce);
+            println!("Length: {}", t_file.info.length);
 
-            let result = parser.parse_torrent_file(&file_content)?;
-
-            println!("Tracker URL: {}", result.announce);
-            println!("Length: {}", result.info.length);
-
-            println!("Info Hash: {}", hash_bytes(&serde_bencode::to_bytes(&result.info)?));
-            println!("Piece Length: {}", result.info.piece_length);
+            println!(
+                "Info Hash: {}",
+                hash_bytes(&serde_bencode::to_bytes(&t_file.info)?)
+            );
+            println!("Piece Length: {}", t_file.info.piece_length);
             println!("Piece Hashes:");
 
-            for piece in result.info.pieces.chunks(20) {
+            for piece in t_file.info.pieces.chunks(20) {
                 println!("{}", bytes_to_hex(piece));
             }
+        }
+        Commands::Peers { path } => {
+            let t_file = Parser::from_path(&path)?;
 
+            let mut request = requests::TrackerRequestBuilder::new()
+                .info_hash(hash_bytes_urlencode(&serde_bencode::to_bytes(
+                    &t_file.info,
+                )?))
+                .port(6881)
+                .uploaded(0)
+                .downloaded(0)
+                .left(t_file.info.length)
+                .compact(1)
+                .build();
+
+            let peers = request.get_peers(t_file.announce).get_peers().unwrap();
+
+            println!("Peers:");
+
+            for peer in peers {
+                println!("{}:{}", peer.0, peer.1);
+            }
         }
     }
 

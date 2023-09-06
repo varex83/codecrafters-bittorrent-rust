@@ -15,4 +15,6 @@ pub enum Commands {
     Decode { string: String },
     /// Info of the torrent file located at <PATH>
     Info { path: String },
+    /// Peers of the torrent file located at <PATH>
+    Peers { path: String },
 }
