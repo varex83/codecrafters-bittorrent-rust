@@ -34,7 +34,7 @@ fn main() -> Result<()> {
             println!("Piece Length: {}", result.info.piece_length);
             println!("Piece Hashes:");
 
-            for piece in result.info.pieces.chunks(10) {
+            for piece in result.info.pieces.chunks(20) {
                 println!("{}", hash_bytes(piece));
             }
 

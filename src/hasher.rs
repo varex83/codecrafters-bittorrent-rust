@@ -3,7 +3,11 @@ use sha1::{Digest, Sha1};
 pub fn hash_bytes(bytes: &[u8]) -> String {
     let mut hasher = Sha1::default();
     hasher.update(bytes);
-    format!("{:x}", hasher.finalize())
+    bytes_to_hex(&hasher.finalize())
+}
+
+fn bytes_to_hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|b| format!("{:02x}", b)).collect()
 }
 
 #[cfg(test)]
