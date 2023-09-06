@@ -1,38 +1,43 @@
-use serde_json;
-use std::env;
+use crate::cli::Commands;
+use crate::parser::{Parser, ValueToString};
+use anyhow::Result;
+use clap::Parser as ClapParser;
+use cli::Cli;
+use sha1::{Digest, Sha1};
 
-// Available if you need it!
-// use serde_bencode
+mod cli;
+mod parser;
 
-#[allow(dead_code)]
-fn decode_bencoded_value(encoded_value: &str) -> serde_json::Value {
-    // If encoded_value starts with a digit, it's a number
-    if encoded_value.chars().next().unwrap().is_digit(10) {
-        // Example: "5:hello" -> "5"
-        let colon_index = encoded_value.find(':').unwrap();
-        let number_string = &encoded_value[..colon_index];
-        let number = number_string.parse::<i64>().unwrap();
-        let string = &encoded_value[colon_index + 1..colon_index + 1 + number as usize];
-        return serde_json::Value::String(string.to_string());
-    } else {
-        panic!("Unhandled encoded value: {}", encoded_value)
+fn main() -> Result<()> {
+    let cli = Cli::parse();
+
+    match cli.command {
+        Commands::Decode { string } => {
+            let mut parser = Parser::new();
+
+            let result = parser.decode_input(string)?;
+
+            println!("{}", result.to_string())
+        }
+        Commands::Info { path } => {
+            let mut parser = Parser::new();
+
+            let file_content = std::fs::read(path)?;
+
+            let result = parser.parse_torrent_file(&file_content)?;
+
+            println!("Tracker URL: {}", result.announce);
+            println!("Length: {}", result.info.length);
+
+            let mut hasher = Sha1::default();
+
+            hasher.update(serde_bencode::to_bytes(&result.info)?);
+
+            let res = hasher.finalize();
+
+            println!("Hash: {:x}", res);
+        }
     }
-}
 
-// Usage: your_bittorrent.sh decode "<encoded_value>"
-fn main() {
-    let args: Vec<String> = env::args().collect();
-    let command = &args[1];
-
-    if command == "decode" {
-        // You can use print statements as follows for debugging, they'll be visible when running tests.
-        println!("Logs from your program will appear here!");
-
-        // Uncomment this block to pass the first stage
-        // let encoded_value = &args[2];
-        // let decoded_value = decode_bencoded_value(encoded_value);
-        // println!("{}", decoded_value.to_string());
-    } else {
-        println!("unknown command: {}", args[1])
-    }
+    Ok(())
 }
