@@ -1,7 +1,6 @@
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use serde_bencode::value::Value;
-use sha1::{Digest, Sha1};
 
 #[derive(Debug, Default)]
 pub struct Parser {}
@@ -20,16 +19,6 @@ pub struct TorrentInfo {
     pub piece_length: u64,
     #[serde(with = "serde_bytes")]
     pub pieces: Vec<u8>,
-}
-
-impl TorrentInfo {
-    pub fn hash(&self) -> Result<Vec<u8>> {
-        let mut hasher = Sha1::default();
-
-        hasher.update(serde_bencode::to_bytes(self)?);
-
-        Ok(hasher.finalize().to_vec())
-    }
 }
 
 impl Parser {

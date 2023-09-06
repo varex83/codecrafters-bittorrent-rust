@@ -3,10 +3,11 @@ use crate::parser::{Parser, ValueToString};
 use anyhow::Result;
 use clap::Parser as ClapParser;
 use cli::Cli;
-use sha1::{Digest, Sha1};
+use crate::hasher::hash_bytes;
 
 mod cli;
 mod parser;
+mod hasher;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -29,13 +30,14 @@ fn main() -> Result<()> {
             println!("Tracker URL: {}", result.announce);
             println!("Length: {}", result.info.length);
 
-            let mut hasher = Sha1::default();
+            println!("Info Hash: {}", hash_bytes(&serde_bencode::to_bytes(&result.info)?));
+            println!("Piece Length: {}", result.info.piece_length);
+            println!("Piece Hashes:");
 
-            hasher.update(serde_bencode::to_bytes(&result.info)?);
+            for piece in result.info.pieces.chunks(20) {
+                println!("{}", hash_bytes(piece));
+            }
 
-            let res = hasher.finalize();
-
-            println!("Info Hash: {:x}", res);
         }
     }
 
