@@ -35,7 +35,7 @@ fn main() -> Result<()> {
 
             let res = hasher.finalize();
 
-            println!("Hash: {:x}", res);
+            println!("Info Hash: {:x}", res);
         }
     }
 
