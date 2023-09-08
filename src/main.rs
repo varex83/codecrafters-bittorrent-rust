@@ -80,7 +80,7 @@ fn main() -> Result<()> {
 
             let peer_id = peer.get_id().unwrap();
 
-            println!("Peer ID: {}", bytes_to_hex(&peer_id));
+            // println!("Peer ID: {}", bytes_to_hex(&peer_id));
             println!("Info Hash: {}", hash_bytes(info_hash));
         }
     }
