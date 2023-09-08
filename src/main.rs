@@ -75,12 +75,12 @@ fn main() -> Result<()> {
 
             let info_hash = &serde_bencode::to_bytes(&t_file.info)?;
 
+            println!("Info Hash: {}", hash_bytes(info_hash));
+
             peer.handshake(info_hash.clone(), b"12345678901234567890".to_vec())
                 .unwrap();
 
             let peer_id = peer.get_id().unwrap();
-
-            println!("Info hash: {}", hash_bytes(info_hash));
 
             println!("Peer ID: {}", bytes_to_hex(&peer_id));
         }
