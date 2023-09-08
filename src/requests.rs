@@ -30,7 +30,7 @@ pub struct TrackerRequestBuilder {
 }
 
 impl TrackerRequest {
-    pub fn get_peers(&self, tracker_url: String) -> TrackerResponse {
+    pub fn execute(&self, tracker_url: String) -> TrackerResponse {
         let client = reqwest::blocking::Client::new();
 
         let url = format!("{}?info_hash={}", tracker_url, &self.info_hash);

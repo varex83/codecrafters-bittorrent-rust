@@ -17,4 +17,6 @@ pub enum Commands {
     Info { path: String },
     /// Peers of the torrent file located at <PATH>
     Peers { path: String },
+    /// Handsake with the peer at <IP:PORT>
+    Handshake { path: String, ip: String },
 }

@@ -4,10 +4,13 @@ use crate::parser::{Parser, ValueToString};
 use anyhow::Result;
 use clap::Parser as ClapParser;
 use cli::Cli;
+use std::net::Ipv4Addr;
+use std::str::FromStr;
 
 mod cli;
 mod hasher;
 mod parser;
+mod peer;
 mod requests;
 
 fn main() -> Result<()> {
@@ -52,13 +55,35 @@ fn main() -> Result<()> {
                 .compact(1)
                 .build();
 
-            let peers = request.get_peers(t_file.announce).get_peers().unwrap();
+            let peers = request.execute(t_file.announce).get_peers().unwrap();
 
             println!("Peers:");
 
             for peer in peers {
                 println!("{}:{}", peer.0, peer.1);
             }
+        }
+        Commands::Handshake { path, ip } => {
+            let t_file = Parser::from_path(&path)?;
+
+            let (ip, port) = ip.split_once(":").unwrap();
+
+            let ip = Ipv4Addr::from_str(ip).unwrap();
+            let port = port.parse::<u16>().unwrap();
+
+            let mut peer = peer::Peer::new(ip, port);
+
+            peer.handshake(
+                Vec::from(hash_bytes_urlencode(&serde_bencode::to_bytes(
+                    &t_file.info,
+                )?)),
+                Vec::from(hash_bytes_urlencode(&b"12345678901234567890"[..])),
+            )
+            .unwrap();
+
+            let peer_id = peer.get_id().unwrap();
+
+            println!("Peer ID: {}", bytes_to_hex(&peer_id));
         }
     }
 
