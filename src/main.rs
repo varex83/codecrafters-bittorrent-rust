@@ -73,19 +73,15 @@ fn main() -> Result<()> {
 
             let mut peer = peer::Peer::new(ip, port);
 
-            let info_hash = Vec::from(hash_bytes_urlencode(&serde_bencode::to_bytes(
-                &t_file.info,
-            )?));
+            let info_hash = &serde_bencode::to_bytes(&t_file.info)?;
 
-            peer.handshake(
-                info_hash,
-                Vec::from(hash_bytes_urlencode(&b"12345678901234567890"[..])),
-            )
-            .unwrap();
+            peer.handshake(info_hash.clone(), b"12345678901234567890".to_vec())
+                .unwrap();
 
             let peer_id = peer.get_id().unwrap();
 
-            println!("Info hash: {}", bytes_to_hex(&info_hash));
+            println!("Info hash: {}", hash_bytes(info_hash));
+
             println!("Peer ID: {}", bytes_to_hex(&peer_id));
         }
     }
