@@ -1,9 +1,6 @@
-use crate::parser::Parser;
-use crate::parser::ValueToString;
 use anyhow::anyhow;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
-use std::io::Read;
 use std::net::Ipv4Addr;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -70,42 +67,49 @@ impl TrackerRequestBuilder {
     pub fn new() -> Self {
         Default::default()
     }
-
+    #[allow(dead_code)]
     pub fn info_hash(mut self, info_hash: String) -> Self {
         self.request.info_hash = info_hash;
         self
     }
 
+    #[allow(dead_code)]
     pub fn peer_id(mut self, peer_id: &str) -> Self {
         self.request.peer_id = peer_id.to_string();
         self
     }
 
+    #[allow(dead_code)]
     pub fn port(mut self, port: u16) -> Self {
         self.request.port = port;
         self
     }
 
+    #[allow(dead_code)]
     pub fn uploaded(mut self, uploaded: u64) -> Self {
         self.request.uploaded = uploaded;
         self
     }
 
+    #[allow(dead_code)]
     pub fn downloaded(mut self, downloaded: u64) -> Self {
         self.request.downloaded = downloaded;
         self
     }
 
+    #[allow(dead_code)]
     pub fn left(mut self, left: u64) -> Self {
         self.request.left = left;
         self
     }
 
+    #[allow(dead_code)]
     pub fn compact(mut self, compact: u8) -> Self {
         self.request.compact = compact;
         self
     }
 
+    #[allow(dead_code)]
     pub fn build(self) -> TrackerRequest {
         self.request
     }

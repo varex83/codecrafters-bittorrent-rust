@@ -44,7 +44,7 @@ fn main() -> Result<()> {
         Commands::Peers { path } => {
             let t_file = Parser::from_path(&path)?;
 
-            let mut request = requests::TrackerRequestBuilder::new()
+            let request = requests::TrackerRequestBuilder::new()
                 .info_hash(hash_bytes_urlencode(&serde_bencode::to_bytes(
                     &t_file.info,
                 )?))
